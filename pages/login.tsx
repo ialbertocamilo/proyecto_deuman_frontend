@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { useRouter } from "next/router";
+import "@assets/css/button-builder.css";
 import axios from "axios";
-//import "@/public/assets/css feather.css";
+import { useRouter } from "next/router";
+import { useState } from "react";
 const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -20,11 +20,25 @@ const Login = () => {
     }
   };
 
-  const test = () => {
-    axios.post("http://localhost:3000/api/login", {})
-  } 
 
-
+  const doLogin = ()=>{
+    console.log('doLogin');
+    axios.post('http://127.0.0.1:8000/login', {
+      email: email,
+      password: password
+    })
+    .then(function (response) { 
+      console.log(response.data);
+      if(response.status === 200){
+        router.push("/admin");
+      }else{
+        setError("Credenciales incorrectas");
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
   const handleForgotPassword = () => {
     router.push("/forgot-password"); 
   };
@@ -118,8 +132,7 @@ const Login = () => {
               border: "none",
               cursor: "pointer",
             }}
-
-
+            onClick={doLogin}
           >
             Iniciar sesión
           </button>
