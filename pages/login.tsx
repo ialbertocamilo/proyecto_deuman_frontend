@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-
+import axios from "axios";
+//import "@/public/assets/css feather.css";
 const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -18,6 +19,11 @@ const Login = () => {
       setError("Credenciales incorrectas");
     }
   };
+
+  const test = () => {
+    axios.post("http://localhost:3000/api/login", {})
+  } 
+
 
   const handleForgotPassword = () => {
     router.push("/forgot-password"); 
@@ -112,6 +118,8 @@ const Login = () => {
               border: "none",
               cursor: "pointer",
             }}
+
+
           >
             Iniciar sesión
           </button>
@@ -132,6 +140,9 @@ const Login = () => {
         >
           Registrarse
         </button>
+        <div className="col-md-6 p-0">                    
+                      <div className="form-group mb-0 me-0"></div><a className="btn btn-primary" href="projectcreate.html"> <i data-feather="plus-square"> </i>Create New Project</a>
+                    </div>
       </div>
     </div>
   );
