@@ -1,27 +1,28 @@
-import "@assets/css/button-builder.css";
+import "../public/assets/css/button-builder.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useState } from "react";
+
 const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // logica de autenticacion
     if (email === "admin@example.com" && password === "password123") {
-      // Redirigir al usuario si las credenciales son correctas
       router.push("/admin");
     } else {
       setError("Credenciales incorrectas");
     }
   };
 
-
-  const doLogin = ()=>{
+  const doLogin = () => {
     console.log('doLogin');
     axios.post('http://127.0.0.1:8000/login', {
       email: email,
@@ -39,123 +40,60 @@ const Login = () => {
       console.log(error);
     });
   }
-  const handleForgotPassword = () => {
-    router.push("/forgot-password"); 
-  };
-
-  const handleRegister = () => {
-    router.push("/register");
-  };
 
   return (
-    <div
-      className="login-container"
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        backgroundColor: "#f5f5f5",
-      }}
-    >
-      <div
-        style={{
-          padding: "2rem",
-          borderRadius: "8px",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          backgroundColor: "#fff",
-          width: "100%",
-          maxWidth: "400px",
-        }}
-      >
-        <h1 style={{ textAlign: "center", marginBottom: "1.5rem" }}>Iniciar sesión</h1>
+    <div className="login-container d-flex justify-content-center align-items-center" style={{ height: "100vh", backgroundColor: "#eef7fc" }}>
+      <div className="card p-4 shadow" style={{ width: "100%", maxWidth: "400px" }}>
+        <div className="text-center mb-4">
+          <img src="/assets/images/proyecto-deuman-logo.png" alt="Proyecto Deuman" className="img-fluid" style={{ maxWidth: "150px" }} />
+        </div>
+        <h5 className="text-start text-primary">Ingresa a tu cuenta</h5>
+        <p className="text-start text-muted">Ingresa tu Email y contraseña para ingresar</p>
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: "1rem" }}>
-            <label htmlFor="email" style={{ display: "block", marginBottom: "0.5rem" }}>
-              Correo electrónico
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "0.5rem",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-              }}
-            />
+          <div className="mb-3">
+            <label className="form-label">Selecciona el país</label>
+            <select className="form-control">
+              <option>Perú</option>
+              <option>México</option>
+              <option>Argentina</option>
+            </select>
           </div>
-          <div style={{ marginBottom: "1rem" }}>
-            <label htmlFor="password" style={{ display: "block", marginBottom: "0.5rem" }}>
-              Contraseña
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "0.5rem",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-              }}
-            />
+          <div className="mb-3">
+            <label className="form-label">Dirección de Email</label>
+            <input type="email" className="form-control" placeholder="Example@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
-          {error && (
-            <p style={{ color: "red", marginBottom: "1rem", textAlign: "center" }}>{error}</p>
-          )}
-          <div style={{ textAlign: "center", marginBottom: "1rem" }}>
-            <a
-              onClick={handleForgotPassword}
-              style={{
-                color: "#007bff",
-                textDecoration: "underline",
-                cursor: "pointer",
-              }}
-            >
-              Olvidé mi contraseña
-            </a>
+          <div className="mb-3 position-relative">
+            <label className="form-label">Contraseña</label>
+            <div className="d-flex align-items-center">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                className="form-control" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required 
+              />
+              <span 
+                className="ms-2 text-primary" 
+                style={{ cursor: "pointer" }}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "Ocultar" : "Mostrar"}
+              </span>
+            </div>
           </div>
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              padding: "0.75rem",
-              borderRadius: "4px",
-              backgroundColor: "#007bff",
-              color: "white",
-              border: "none",
-              cursor: "pointer",
-            }}
-            onClick={doLogin}
-          >
-            Iniciar sesión
-          </button>
+          {error && <p className="text-danger text-center">{error}</p>}
+          <div className="form-check mb-3">
+            <input className="form-check-input" type="checkbox" />
+            <label className="form-check-label">Recuérdame</label>
+          </div>
+          <button type="submit" className="btn btn-primary w-100">Ingresar</button>
         </form>
-        <button
-          type="button"
-          onClick={handleRegister}
-          style={{
-            width: "100%",
-            padding: "0.75rem",
-            borderRadius: "4px",
-            backgroundColor: "#6c757d",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-            marginTop: "1rem",
-          }}
-        >
-          Registrarse
-        </button>
-        <div className="col-md-6 p-0">                    
-                      <div className="form-group mb-0 me-0"></div><a className="btn btn-primary" href="projectcreate.html"> <i data-feather="plus-square"> </i>Create New Project</a>
-                    </div>
+        <div className="text-start mt-3">
+          <a href="/forgot-password" className="text-decoration-none text-primary">¿Olvidaste tu contraseña?</a>
+        </div>
+        <div className="text-start mt-4">
+          <p className="text-muted">Aún no tienes cuenta? <a href="/register" className="text-decoration-none text-primary">Crear una cuenta</a></p>
+        </div>
       </div>
     </div>
   );

@@ -7,6 +7,10 @@ const Register = () => {
     name: "",
     lastname: "",
     email: "",
+    number_phone: "",
+    birthdate: "",
+    country: "",
+    ubigeo: "",
     password: "",
     confirm_password: "",
     acceptTerms: false,
@@ -42,28 +46,43 @@ const Register = () => {
   };
 
   return (
-    <div className="register-container d-flex justify-content-center align-items-center" style={{ height: "100vh", backgroundColor: "#eef7fc" }}>
-      <div className="card p-5 shadow" style={{ width: "100%", maxWidth: "420px", borderRadius: "15px" }}>
+    <div className="register-container d-flex justify-content-center align-items-center min-vh-100 bg-light px-3">
+      <div className="card p-4 shadow-lg w-100" style={{ maxWidth: "500px", borderRadius: "15px" }}>
         <div className="text-center mb-4">
           <img src="/assets/images/proyecto-deuman-logo.png" alt="Proyecto CEELA" className="img-fluid" style={{ maxWidth: "150px" }} />
         </div>
         <h4 className="text-start text-primary fw-bold">Crea tu cuenta</h4>
         <p className="text-start text-muted mb-4">Ingresa tus datos personales y crea tu cuenta</p>
         <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label fw-bold">Nombre</label>
-            <div className="row">
-              <div className="col">
-                <input type="text" className="form-control" placeholder="Nombres" name="name" value={formData.name} onChange={handleChange} required />
-              </div>
-              <div className="col">
-                <input type="text" className="form-control" placeholder="Apellidos" name="lastname" value={formData.lastname} onChange={handleChange} required />
-              </div>
+          <div className="row g-3">
+            <div className="col-md-6">
+              <label className="form-label fw-bold">Nombre</label>
+              <input type="text" className="form-control" placeholder="Nombres" name="name" value={formData.name} onChange={handleChange} required />
+            </div>
+            <div className="col-md-6">
+              <label className="form-label fw-bold">Apellido</label>
+              <input type="text" className="form-control" placeholder="Apellidos" name="lastname" value={formData.lastname} onChange={handleChange} required />
             </div>
           </div>
-          <div className="mb-3">
-            <label className="form-label fw-bold">Dirección de Email</label>
+          <div className="mb-3 mt-3">
+            <label className="form-label fw-bold">Correo Electrónico</label>
             <input type="email" className="form-control" placeholder="Example@gmail.com" name="email" value={formData.email} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-bold">Teléfono</label>
+            <input type="text" className="form-control" placeholder="Número de teléfono" name="number_phone" value={formData.number_phone} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-bold">Fecha de Nacimiento</label>
+            <input type="date" className="form-control" name="birthdate" value={formData.birthdate} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-bold">País</label>
+            <input type="text" className="form-control" placeholder="País" name="country" value={formData.country} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-bold">Ubigeo</label>
+            <input type="text" className="form-control" placeholder="Ubigeo" name="ubigeo" value={formData.ubigeo} onChange={handleChange} required />
           </div>
           <div className="mb-3">
             <label className="form-label fw-bold">Contraseña</label>
