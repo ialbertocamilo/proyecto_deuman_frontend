@@ -7,10 +7,15 @@ const Register = () => {
     name: "",
     lastname: "",
     email: "",
+    number_phone: "",
+    birthdate: "",
+    country: "",
+    ubigeo: "",
     password: "",
     confirm_password: "",
     acceptTerms: false,
   });
+
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -21,25 +26,81 @@ const Register = () => {
     setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validatePassword = (password: string) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+    return passwordRegex.test(password);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const { password, confirm_password, acceptTerms } = formData;
-
+    console.log("✅ Formulario enviado");
+  
+    const { password, confirm_password, acceptTerms, ...userData } = formData;
+  
     if (password !== confirm_password) {
       setError("Las contraseñas no coinciden");
       return;
     }
-
+  
+    if (!validatePassword(password)) {
+      setError("La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial (!@#$%^&*)");
+      return;
+    }
+  
     if (!acceptTerms) {
       setError("Debes aceptar las políticas de privacidad");
       return;
     }
-
-    console.log("Datos enviados:", formData);
-    setError(null);
-    setSuccessMessage("Registro exitoso. Ahora puedes iniciar sesión.");
+  
+    for (const key in userData) {
+      if (userData[key as keyof typeof userData].trim() === "") {
+        setError(`El campo ${key} es obligatorio.`);
+        return;
+      }
+    }
+  
+    const formattedBirthdate = userData.birthdate;
+  
+    const requestBody = {
+      ...userData,
+      birthdate: formattedBirthdate,
+      password,
+      confirm_password,
+    };
+  
+    console.log("📨 JSON enviado:", requestBody);
+  
+    try {
+      const response = await fetch("http://deuman-backend.svgdev.tech/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+  
+      // Capturar respuesta de la API
+      const result = await response.json();
+      console.log("📩 Respuesta de la API:", result); // <-- Muestra lo que devuelve la API
+  
+      if (!response.ok) {
+        throw new Error(result.message || "Error en el registro");
+      }
+  
+      setSuccessMessage("Registro exitoso. Ahora puedes iniciar sesión.");
+      setError(null);
+      console.log("✅ Registro exitoso");
+  
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    } catch (error: any) {
+      console.error("Error de la API:", error.message);
+      setError(error.message || "Error en la comunicación con el servidor");
+    }
   };
+  
+  
 
   return (
     <div className="register-container d-flex justify-content-center align-items-center" style={{ height: "100vh", backgroundColor: "#eef7fc" }}>
@@ -66,6 +127,22 @@ const Register = () => {
             <input type="email" className="form-control" placeholder="Example@gmail.com" name="email" value={formData.email} onChange={handleChange} required />
           </div>
           <div className="mb-3">
+            <label className="form-label fw-bold">Teléfono</label>
+            <input type="text" className="form-control" placeholder="Número de teléfono" name="number_phone" value={formData.number_phone} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-bold">Fecha de Nacimiento</label>
+            <input type="date" className="form-control" name="birthdate" value={formData.birthdate} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-bold">País</label>
+            <input type="text" className="form-control" placeholder="País" name="country" value={formData.country} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-bold">Ubigeo</label>
+            <input type="text" className="form-control" placeholder="Código Ubigeo" name="ubigeo" value={formData.ubigeo} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
             <label className="form-label fw-bold">Contraseña</label>
             <div className="input-group">
               <input type={showPassword ? "text" : "password"} className="form-control" placeholder="Ingresa tu contraseña" name="password" value={formData.password} onChange={handleChange} required />
@@ -85,9 +162,6 @@ const Register = () => {
           {successMessage && <p className="text-success text-center">{successMessage}</p>}
           <button type="submit" className="btn btn-primary w-100">Crear cuenta</button>
         </form>
-        <div className="text-center mt-3">
-          <p className="text-muted">¿Ya tienes una cuenta? <a href="/login" className="text-decoration-none text-primary">Ingresar</a></p>
-        </div>
       </div>
     </div>
   );

@@ -40,9 +40,9 @@ const ProjectList = ({ setActiveView }: ProjectListProps) => {
       </div>
       <button
         className="btn btn-primary"
-        onClick={() => setActiveView('newProject')} // Cambia la vista a "newProject"
+        onClick={() => setActiveView('projectWorkflow')} // Cambia la vista a "projectWorkflow"
       >
-        Nuevo proyecto
+        + Proyecto Nuevo
       </button>
     </div>
   );

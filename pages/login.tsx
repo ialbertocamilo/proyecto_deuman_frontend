@@ -46,17 +46,9 @@ const Login = () => {
   return (
     <div 
       className="login-container d-flex justify-content-center align-items-center" 
-      style={{ height: "100vh", backgroundColor: "#eef7fc", fontFamily: "Poppins, sans-serif" }}
+      style={{ height: "100vh", background: "url('/assets/images/background.jpg') no-repeat center center/cover", fontFamily: "Poppins, sans-serif" }}
     >
       <div className="card p-4 shadow" style={{ width: "100%", maxWidth: "400px" }}>
-        <div className="text-center mb-4">
-          <img 
-            src="/assets/images/proyecto-deuman-logo.png" 
-            alt="Proyecto Deuman" 
-            className="img-fluid rounded-circle" 
-            style={{ maxWidth: "150px" }} 
-          />
-        </div>
         <h5 className="text-start text-primary fw-bold">Ingresa a tu cuenta</h5>
         <p className="text-start text-muted">Ingresa tu Email y contraseña para ingresar</p>
         <form onSubmit={handleSubmit}>

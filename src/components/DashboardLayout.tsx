@@ -1,22 +1,20 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useState } from 'react';
-import Navbar from '../src/components/layout/Navbar';
-import TopBar from '../src/components/layout/TopBar';
-import ProjectList from '../src/components/forms/ProjectList';
-import NewProjectForm from '../src/components/forms/NewProjectForm';
+import Navbar from './layout/Navbar';
+import TopBar from './layout/TopBar';
+import ProjectList from './forms/ProjectList';
+import ProjectWorkflow from './forms/ProjectWorkflow';
 
 const Dashboard = () => {
   const [activeView, setActiveView] = useState('projects'); // Estado para manejar las vistas
 
   const renderContent = () => {
     switch (activeView) {
-      case 'newProject':
-        return <NewProjectForm />; // Renderiza el formulario de nuevo proyecto
+      case 'projectWorkflow':
+        return <ProjectWorkflow />; // Renderiza el flujo paso a paso de registro de proyectos
       case 'projects':
-        return (
-          <ProjectList setActiveView={setActiveView} />
-        ); // Renderiza la lista de proyectos
+        return <ProjectList setActiveView={setActiveView} />; // Renderiza la lista de proyectos
       default:
         return (
           <div className="text-center mt-5">
