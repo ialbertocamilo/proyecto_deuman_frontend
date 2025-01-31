@@ -8,7 +8,17 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 
 const ProjectOperableElements = () => {
-  const [operableElements, setOperableElements] = useState([]);
+  interface OperableElement {
+    name: string;
+    u_glass: number;
+    fs_glass: number;
+    closure_type: string;
+    frame_type: string;
+    u_frame: number;
+    fm_percentage: number;
+  }
+  
+  const [operableElements, setOperableElements] = useState<OperableElement[]>([]);
   const router = useRouter();
 
   useEffect(() => {

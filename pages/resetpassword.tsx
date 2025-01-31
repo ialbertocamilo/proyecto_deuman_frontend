@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 const ResetPassword = () => {
@@ -9,10 +9,17 @@ const ResetPassword = () => {
     new_password: "",
     confirm_new_password: "",
   });
-  const [message, setMessage] = useState<string | null>(null);
+
   const [error, setError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
   const router = useRouter();
+
+  useEffect(() => {
+    // Recuperar el email almacenado en forgot-password.tsx
+    const storedEmail = localStorage.getItem("reset_email");
+    if (storedEmail) {
+      setFormData((prevData) => ({ ...prevData, email: storedEmail }));
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -42,10 +49,6 @@ const ResetPassword = () => {
         throw new Error(result.message || "Error al restablecer la contraseña");
       }
       
-      setMessage("Tu contraseña ha sido restablecida correctamente.");
-      setError(null);
-      setFormData({ email: "", code: "", new_password: "", confirm_new_password: "" });
-
       setTimeout(() => {
         router.push("/login");
       }, 2000);
@@ -71,6 +74,7 @@ const ResetPassword = () => {
               value={formData.email}
               onChange={handleChange}
               required
+              readOnly
             />
           </div>
           <div className="mb-3">
@@ -87,20 +91,15 @@ const ResetPassword = () => {
           </div>
           <div className="mb-3">
             <label className="form-label fw-bold">Nueva contraseña</label>
-            <div className="input-group">
-              <input
-                type={showPassword ? "text" : "password"}
-                className="form-control"
-                name="new_password"
-                placeholder="••••••••"
-                value={formData.new_password}
-                onChange={handleChange}
-                required
-              />
-              <button className="btn btn-outline-secondary" type="button" onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? "Ocultar" : "Mostrar"}
-              </button>
-            </div>
+            <input
+              type="password"
+              className="form-control"
+              name="new_password"
+              placeholder="••••••••"
+              value={formData.new_password}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div className="mb-3">
             <label className="form-label fw-bold">Confirmar nueva contraseña</label>
@@ -116,11 +115,7 @@ const ResetPassword = () => {
           </div>
           <button type="submit" className="btn btn-primary w-100">Restablecer contraseña</button>
         </form>
-        {message && <p className="text-success text-center mt-3">{message}</p>}
         {error && <p className="text-danger text-center mt-3">{error}</p>}
-        <div className="text-center mt-3">
-          <a href="/login" className="text-decoration-none text-primary">Volver al inicio de sesión</a>
-        </div>
         <div className="text-center mt-3">
           <a href="/login" className="btn btn-outline-secondary">Regresar</a>
         </div>

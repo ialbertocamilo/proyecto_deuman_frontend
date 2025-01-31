@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState<string>("");
-  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -21,14 +20,17 @@ const ForgotPassword = () => {
       });
 
       const result = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(result.message || "Error en el proceso de recuperación de contraseña");
       }
+
+      // Guardar el email en localStorage para usarlo en reset-password.tsx
+      localStorage.setItem("reset_email", email);
+
+      // Redirigir directamente a reset-password.tsx
+      router.push("/resetpassword");
       
-      setMessage("Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.");
-      setError(null);
-      setEmail("");
     } catch (error: any) {
       setError(error.message);
     }
@@ -54,11 +56,7 @@ const ForgotPassword = () => {
           </div>
           <button type="submit" className="btn btn-primary w-100">Enviar enlace de recuperación</button>
         </form>
-        {message && <p className="text-success text-center mt-3">{message}</p>}
         {error && <p className="text-danger text-center mt-3">{error}</p>}
-        <div className="text-center mt-3">
-          <p className="text-muted">¿Recordaste tu contraseña? <a href="/login" className="text-decoration-none text-primary">Ingresar</a></p>
-        </div>
         <div className="text-center mt-3">
           <a href="/login" className="btn btn-outline-secondary">Regresar</a>
         </div>

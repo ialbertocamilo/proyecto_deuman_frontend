@@ -5,10 +5,17 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import axios from "axios";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const ProjectMaterials = () => {
-  const [materials, setMaterials] = useState([]);
+  interface Material {
+    name: string;
+    conductivity: number;
+    specific_heat: number;
+    density: number;
+  }
+
+  const [materials, setMaterials] = useState<Material[]>([]);
   const router = useRouter();
 
   const fetchMaterials = async () => {
@@ -20,7 +27,7 @@ const ProjectMaterials = () => {
     }
   };
 
-  useState(() => {
+  useEffect(() => {
     fetchMaterials();
   }, []);
 
