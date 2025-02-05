@@ -6,8 +6,7 @@ const TwoFactorAuth = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
-  
-  // Recuperamos el email desde localStorage al cargar el componente
+
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,24 +26,50 @@ const TwoFactorAuth = () => {
     setError(null);
     setLoading(true);
 
-    if (!email) return;
+    if (!email) {
+      setError("El email no está definido. Vuelve a iniciar sesión.");
+      setLoading(false);
+      return;
+    }
 
-    const requestBody = { email, otp };
-
-    console.log("📤 Enviando código al backend:", requestBody);
+    const requestBody = { email, otp: otp.toString() }; // Asegurar que otp sea string
+    console.log("📤 Enviando código al backend:", JSON.stringify(requestBody, null, 2));
 
     try {
       const response = await fetch("http://deuman-backend.svgdev.tech/2fa-verify", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
         body: JSON.stringify(requestBody),
       });
+
+      console.log("📩 Respuesta completa del backend:", response);
 
       const data = await response.json();
       console.log("✅ Respuesta del backend:", data);
 
       if (!response.ok) {
-        throw new Error(data.message || "Código incorrecto.");
+        console.error("❌ Error en la verificación:", data);
+        throw new Error(data.detail || "Código incorrecto.");
+      }
+
+      // 💾 Guardar el token correctamente
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+        console.log("🔑 Token almacenado correctamente:", data.access_token);
+      } else {
+        console.error("❌ No se recibió un token válido del backend.");
+        throw new Error("No se pudo autenticar el usuario.");
+      }
+
+      // Guardar el perfil del usuario en localStorage
+      if (data.user) {
+        localStorage.setItem("userProfile", JSON.stringify(data.user));
+        console.log("👤 Perfil de usuario guardado correctamente:", data.user);
+      } else {
+        console.warn("No se recibió información de perfil del usuario.");
       }
 
       console.log("🔓 Autenticación completada. Redirigiendo...");
@@ -54,7 +79,7 @@ const TwoFactorAuth = () => {
         router.push("/dashboard");
       }, 200);
     } catch (err: any) {
-      console.error("❌ Error en la verificación:", err.message);
+      console.error("Error en la verificación:", err.message);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -69,15 +94,15 @@ const TwoFactorAuth = () => {
         {error && <p className="text-danger text-center fw-bold">{error}</p>}
 
         <form onSubmit={handleSubmit} className="form-auth">
-          <input 
-            type="text" 
-            className="otp-input" 
+          <input
+            type="text"
+            className="otp-input"
             placeholder="******"
-            maxLength={6} 
-            value={otp} 
+            maxLength={6}
+            value={otp}
             onChange={(e) => setOtp(e.target.value)}
-            required 
-            pattern="[0-9]{6}" 
+            required
+            pattern="[0-9]{6}"
             inputMode="numeric"
           />
           <button type="submit" className="btn btn-primary w-100 fw-bold" disabled={loading}>

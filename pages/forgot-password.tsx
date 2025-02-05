@@ -25,10 +25,10 @@ const ForgotPassword = () => {
         throw new Error(result.message || "Error en el proceso de recuperación de contraseña");
       }
 
-      // Guardar el email en localStorage para usarlo en reset-password.tsx
+      // guardar el email en localStorage
       localStorage.setItem("reset_email", email);
 
-      // Redirigir directamente a reset-password.tsx
+      // redirigire a reset-password
       router.push("/resetpassword");
       
     } catch (error: any) {

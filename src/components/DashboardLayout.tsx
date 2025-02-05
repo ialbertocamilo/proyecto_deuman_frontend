@@ -9,12 +9,14 @@ import ProjectList from './forms/ProjectList';
 import ProjectWorkflow from './forms/ProjectWorkflow';
 
 const Dashboard = () => {
-  const [activeView, setActiveView] = useState('projects'); // Estado para manejar las vistas
+  const [activeView, setActiveView] = useState('projects'); // manejar las vistas
 
-  // Función para renderizar la vista activa
+  // renderizar la vista activa
   const renderContent = () => {
     if (activeView === 'projectWorkflow') {
-      return <ProjectWorkflow />;
+      return <ProjectWorkflow setActiveView={function (view: string): void {
+        throw new Error('Function not implemented.');
+      } } />;
     }
     if (activeView === 'projects') {
       return <ProjectList setActiveView={setActiveView} />;
@@ -30,7 +32,7 @@ const Dashboard = () => {
 
   return (
     <div className="d-flex">
-      {/* Barra lateral de navegación */}
+      {/* Barra lateral */}
       <Navbar setActiveView={setActiveView} />
 
       {/* Contenedor principal */}

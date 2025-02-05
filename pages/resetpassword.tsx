@@ -14,7 +14,6 @@ const ResetPassword = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Recuperar el email almacenado en forgot-password.tsx
     const storedEmail = localStorage.getItem("reset_email");
     if (storedEmail) {
       setFormData((prevData) => ({ ...prevData, email: storedEmail }));

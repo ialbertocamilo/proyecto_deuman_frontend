@@ -36,20 +36,20 @@ const Login = () => {
         throw new Error(data.message || "Credenciales incorrectas.");
       }
 
-      // Guardar los datos en localStorage
+      // guardar los datos en localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("email", email);
-      localStorage.setItem("user_name", data.name || "Usuario"); // Guarda el nombre del usuario
+      localStorage.setItem("user_name", data.name || "Usuario"); 
 
-      console.log("🔑 Token guardado:", data.token);
-      console.log("📧 Email guardado para 2FA:", email);
-      console.log("👤 Nombre del usuario guardado:", data.name);
+      console.log("Token guardado:", data.token);
+      console.log("Email guardado para 2FA:", email);
+      console.log("Nombre del usuario guardado:", data.name);
 
       setTimeout(() => {
-        router.push("/twofactorauth"); // Redirigir a 2FA
+        router.push("/twofactorauth"); 
       }, 200);
     } catch (err: any) {
-      console.error("❌ Error al iniciar sesión:", err.message);
+      console.error("Error al iniciar sesión:", err.message);
       setError(err.message);
     } finally {
       setLoading(false);

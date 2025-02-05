@@ -32,8 +32,6 @@ const Register = () => {
     e.preventDefault();
     setError(null);
     setSuccessMessage(null);
-
-    // Validaciones básicas
     if (!formData.name || !formData.lastname || !formData.email || !formData.password || !formData.confirm_password) {
       setError("Todos los campos obligatorios deben estar completos.");
       return;
@@ -43,7 +41,6 @@ const Register = () => {
       setError("Las contraseñas no coinciden.");
       return;
     }
-
     setLoading(true);
     const requestBody = {
       name: formData.name,
@@ -57,7 +54,7 @@ const Register = () => {
       confirm_password: formData.confirm_password,
     };
 
-    console.log("📤 Enviando datos al backend:", requestBody); // Consola para verificar datos enviados
+    console.log("📤 Enviando datos al backend:", requestBody); // consola para verificar datos enviados
 
     try {
       const response = await fetch("http://deuman-backend.svgdev.tech/register", {
@@ -67,7 +64,7 @@ const Register = () => {
       });
 
       const data = await response.json();
-      console.log("✅ Respuesta del backend:", data); // Consola para verificar respuesta del servidor
+      console.log("Respuesta del backend:", data); // consola para verificar respuesta del servidor
 
       if (!response.ok) {
         throw new Error(data.message || "Error al registrar usuario.");
@@ -76,9 +73,9 @@ const Register = () => {
       setSuccessMessage("Registro exitoso. Redirigiendo al login...");
       setTimeout(() => {
         router.push("/login");
-      }, 500); // Redirigir después de 2 segundos
+      }, 500); 
     } catch (err: any) {
-      console.error("❌ Error al registrar:", err.message); // Consola para errores
+      console.error("Error al registrar:", err.message); // consola para errores
       setError(err.message);
     } finally {
       setLoading(false);
@@ -113,7 +110,7 @@ const Register = () => {
               </button>
             </div>
 
-            {/* Sección de Datos Personales */}
+            {/* Datos Personales */}
             <div className="col-md-7">
               <label className="form-label fw-bold">Nombres</label>
               <input type="text" className="form-control mb-3" name="name" value={formData.name} onChange={handleChange} required />
