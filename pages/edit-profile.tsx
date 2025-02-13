@@ -3,8 +3,10 @@ import { useRouter } from "next/router";
 import Swal from "sweetalert2";
 import Navbar from "../src/components/layout/Navbar";
 import TopBar from "../src/components/layout/TopBar";
-import Button from "../src/components/common/Button";
+import CustomButton from "../src/components/common/CustomButton";
 import { constantUrlApiEndpoint } from "../src/utils/constant-url-endpoint";
+import "../public/assets/css/globals.css";
+
 interface ProfileData {
   name: string;
   lastname: string;
@@ -93,12 +95,13 @@ const EditProfile = () => {
         const errorData = await response.json();
         console.error("Error actualizando perfil:", errorData);
         throw new Error(
-          errorData.detail || errorData.message || "No se pudo actualizar el perfil"
+          errorData.detail ||
+            errorData.message ||
+            "No se pudo actualizar el perfil"
         );
       }
 
       const resData = await response.json();
-
       localStorage.setItem("userProfile", JSON.stringify(payload));
 
       await Swal.fire({
@@ -123,7 +126,7 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="d-flex">
+    <div className="d-flex" style={{ fontFamily: "var(--font-family-base)" }}>
       <Navbar setActiveView={() => {}} setSidebarWidth={setSidebarWidth} />
       <div
         className="d-flex flex-column flex-grow-1"
@@ -136,93 +139,124 @@ const EditProfile = () => {
         <div className="container p-4" style={{ marginTop: "60px" }}>
           {/* Encabezado y botones */}
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2 className="fw-bold" style={{ color: "#6dbdc9", margin: 0 }}>
-              Editar Perfil
+            <h2
+              className="fw-bold"
+              style={{
+                color: "var(--primary-color)",
+                margin: 0,
+                fontFamily: "var(--font-family-base)",
+              }}
+            >
+              Perfil
             </h2>
             <div className="d-flex" style={{ gap: "1rem" }}>
-              <Button
-                text="← Regresar"
+              <CustomButton
+                variant="back"
                 onClick={() => router.push("/dashboard")}
-                className="btn-secondary"
-              />
-              <button
+              >
+                ← Regresar
+              </CustomButton>
+              <CustomButton
+                variant="save"
                 type="submit"
                 form="editProfileForm"
-                className="btn"
                 disabled={loading}
-                style={{
-                  backgroundColor: "#3ca7b7",
-                  border: "none",
-                  borderRadius: "0.5rem",
-                  padding: "12px",
-                  fontSize: "1rem",
-                  transition: "background 0.3s ease",
-                  color: "#fff",
-                }}
               >
                 {loading ? "Actualizando..." : "Actualizar Perfil"}
-              </button>
+              </CustomButton>
             </div>
           </div>
           {loading ? (
-            <p className="text-primary">Cargando...</p>
+            <p
+              className="text-primary"
+              style={{ fontFamily: "var(--font-family-base)" }}
+            >
+              Cargando...
+            </p>
           ) : (
-            <form id="editProfileForm" onSubmit={handleSubmit}>
-              {error && <p className="text-danger">{error}</p>}
+            <form
+              id="editProfileForm"
+              onSubmit={handleSubmit}
+              style={{ fontFamily: "var(--font-family-base)" }}
+            >
+              {error && (
+                <p
+                  className="text-danger"
+                  style={{ fontFamily: "var(--font-family-base)" }}
+                >
+                  {error}
+                </p>
+              )}
               <div className="mb-3">
-                <label>Nombre</label>
+                <label style={{ fontFamily: "var(--font-family-base)" }}>
+                  Nombre
+                </label>
                 <input
                   type="text"
                   name="name"
                   className="form-control"
                   value={profile.name}
                   onChange={handleChange}
+                  style={{ fontFamily: "var(--font-family-base)" }}
                 />
               </div>
               <div className="mb-3">
-                <label>Apellidos</label>
+                <label style={{ fontFamily: "var(--font-family-base)" }}>
+                  Apellidos
+                </label>
                 <input
                   type="text"
                   name="lastname"
                   className="form-control"
                   value={profile.lastname}
                   onChange={handleChange}
+                  style={{ fontFamily: "var(--font-family-base)" }}
                 />
               </div>
               <div className="mb-3">
-                <label>Teléfono</label>
+                <label style={{ fontFamily: "var(--font-family-base)" }}>
+                  Teléfono
+                </label>
                 <input
                   type="text"
                   name="number_phone"
                   className="form-control"
                   value={profile.number_phone}
                   onChange={handleChange}
+                  style={{ fontFamily: "var(--font-family-base)" }}
                 />
               </div>
               <div className="mb-3">
-                <label>País</label>
+                <label style={{ fontFamily: "var(--font-family-base)" }}>
+                  País
+                </label>
                 <input
                   type="text"
                   name="country"
                   className="form-control"
                   value={profile.country}
                   onChange={handleChange}
+                  style={{ fontFamily: "var(--font-family-base)" }}
                 />
               </div>
               <div className="mb-3">
-                <label>Ubigeo</label>
+                <label style={{ fontFamily: "var(--font-family-base)" }}>
+                  Ubigeo
+                </label>
                 <input
                   type="text"
                   name="ubigeo"
                   className="form-control"
                   value={profile.ubigeo}
                   onChange={handleChange}
+                  style={{ fontFamily: "var(--font-family-base)" }}
                 />
               </div>
             </form>
           )}
         </div>
       </div>
+      
     </div>
   );
 };

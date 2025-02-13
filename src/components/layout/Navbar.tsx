@@ -2,212 +2,286 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import React from "react";
 
 interface NavbarProps {
-  setActiveView: (view: string) => void;
   setSidebarWidth: (width: string) => void;
+  setActiveView: (view: string) => void;
 }
 
-const Navbar = ({ setActiveView, setSidebarWidth }: NavbarProps) => {
+const Navbar = ({ setSidebarWidth, setActiveView }: NavbarProps) => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState({
     proyectos: false,
-    usuarios: false,
+    user: false,
+    parametros: false,
   });
+  const [logoUrl, setLogoUrl] = useState("/assets/images/proyecto-deuman-logo.png");
 
   useEffect(() => {
     setSidebarWidth(isOpen ? "300px" : "80px");
   }, [isOpen, setSidebarWidth]);
 
+  useEffect(() => {
+    const storedLogo = localStorage.getItem("logoUrl");
+    if (storedLogo) {
+      setLogoUrl(storedLogo);
+    }
+  }, []);
+
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleClickAndExpand = (
-    menu: "proyectos" | "usuarios" | null,
-    view: string
-  ) => {
+  const toggleSubmenu = (menu: "proyectos" | "user" | "parametros") => {
     if (!isOpen) {
       setIsOpen(true);
     }
-    if (menu === "proyectos") {
-      setSubmenuOpen((prev) => ({ ...prev, proyectos: !prev.proyectos }));
-      setActiveView("projects");
-    } else if (menu) {
-      setSubmenuOpen((prev) => ({ ...prev, [menu]: !prev[menu] }));
-    } else {
-      setActiveView(view);
-    }
+    setSubmenuOpen((prev) => ({ ...prev, [menu]: !prev[menu] }));
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    router.push("/login");
+  };
+
+  const navLinkStyle: React.CSSProperties = {
+    cursor: "pointer",
+    fontFamily: "var(--font-family-base)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: isOpen ? "flex-start" : "center",
+    width: "100%",
+    paddingLeft: "2px",
+  };
+
+  const iconStyle: React.CSSProperties = {
+    fontSize: "2rem",     // Tamaño de la fuente del ícono
+    width: "2rem",        // Ancho 
+    textAlign: "center",  // Centra el contenido 
+    marginRight: isOpen ? "10px" : "0", 
+    marginLeft: "5px", 
   };
 
   return (
     <nav
       className="sidebar d-flex flex-column p-3"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
       style={{
         position: "fixed",
         left: 0,
         top: 0,
         zIndex: 1000,
         width: isOpen ? "300px" : "80px",
-        backgroundColor: "#2c99a4",
+        backgroundColor: "var(--primary-color)", 
         color: "#fff",
-        transition: "width 0.1s ease",
         height: "100vh",
-        
+        fontFamily: "var(--font-family-base)",
       }}
     >
-      {/* Encabezado */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <img
-          src="/assets/images/proyecto-deuman-logo.png"
-          alt="Proyecto Ceela"
-          className="logo"
-          style={{ width: "50px", borderRadius: "50%", cursor: "pointer" }}
-          onClick={() => handleClickAndExpand(null, "dashboard")}
-        />
-        <div
-          onClick={toggleSidebar}
-          style={{
-            cursor: "pointer",
-            color: "#fff",
-            fontSize: "24px",
-            marginLeft: "10px",
-            lineHeight: "0",
-          }}
-        >
-          <i className={`bi ${isOpen ? "bi-chevron-left" : "bi-chevron-right"}`}></i>
-        </div>
+      <div
+        className={`d-flex align-items-center mb-4 ${isOpen ? "justify-content-center" : "justify-content-between"}`}
+        style={{ fontFamily: "var(--font-family-base)" }}
+      >
+        <Link href="/dashboard">
+          <img
+            src={logoUrl}
+            alt="Proyecto Ceela"
+            className="logo"
+            style={{
+              width: "55px",
+              borderRadius: "50%",
+              cursor: "pointer",
+            }}
+          />
+        </Link>
+        {/* Muestra el toggle solo cuando la sidebar está colapsada */}
+        {!isOpen && (
+          <div
+            onClick={toggleSidebar}
+            style={{
+              cursor: "pointer",
+              color: "#fff",
+              fontSize: "2rem",
+              lineHeight: "0",
+              fontFamily: "var(--font-family-base)",
+            }}
+          >
+            <i style={iconStyle} className={`bi ${isOpen ? "bi-chevron-left" : "bi-chevron-right"}`}></i>
+          </div>
+        )}
       </div>
 
-      <div className="menu-container">
-        
+      {/* Contenedor del menu de navegacion */}
+      <div
+        className="menu-container"
+        style={{
+          fontFamily: "var(--font-family-base)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-end",
+          height: "100%",
+        }}
+      >
         <ul className="nav flex-column">
-          {/* Listado de proyectos */}
+          {/* Elemento Dashboard */}
           <li className="nav-item mb-3">
-            <a
+            <Link href="/dashboard" className="nav-link text-white" style={navLinkStyle}>
+              <i style={iconStyle} className="bi bi-speedometer2"></i>
+              {isOpen && "Dashboard"}
+            </Link>
+          </li>
+
+          {/* Menú de Proyectos */}
+          <li className="nav-item mb-3">
+            <div
               className="nav-link text-white d-flex justify-content-between align-items-center"
-              style={{ cursor: "pointer" }}
-              onClick={() => handleClickAndExpand("proyectos", "projects")}
+              style={navLinkStyle}
+              onClick={() => toggleSubmenu("proyectos")}
             >
-              <div>
-                <i className="bi bi-list"></i> {isOpen && "Listado de proyectos"}
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <i style={iconStyle} className="bi bi-list"></i>
+                {isOpen && "Proyectos"}
               </div>
               {isOpen && (
-                <i
-                  className={`bi ${
-                    submenuOpen.proyectos ? "bi-chevron-up" : "bi-chevron-down"
-                  }`}
-                ></i>
+                <i style={iconStyle} className={`bi ${submenuOpen.proyectos ? "bi-chevron-up" : "bi-chevron-down"}`}></i>
               )}
-            </a>
+            </div>
             {submenuOpen.proyectos && isOpen && (
               <ul className="nav flex-column ms-3 submenu">
                 <li className="nav-item">
-                  <a
-                    onClick={() => handleClickAndExpand(null, "projectWorkflow")}
-                    className="nav-link text-white"
-                    style={{ cursor: "pointer" }}
-                  >
-                    Registro de proyecto
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <Link href="#" className="nav-link text-white">
-                    Registro de parámetros
+                  <Link href="/project-list" className="nav-link text-white" style={navLinkStyle}>
+                    Listado De Proyectos
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link href="#" className="nav-link text-white">
-                    Registro de recintos
+                  <Link href="/project-workflow" className="nav-link text-white" style={navLinkStyle}>
+                    Registro De Proyectos
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link href="#" className="nav-link text-white">
-                    Emisión de resultados
+                  <Link href="/project-status" className="nav-link text-white" style={navLinkStyle}>
+                    Estado De Proyectos
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link href="/parametros" className="nav-link text-white" style={navLinkStyle}>
+                    Registro De Parámetros
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link href="/recintos" className="nav-link text-white" style={navLinkStyle}>
+                    Registro De Recintos
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link href="/resultados" className="nav-link text-white" style={navLinkStyle}>
+                    Emisión De Resultados
                   </Link>
                 </li>
               </ul>
             )}
           </li>
 
-          {/* Registro de usuarios */}
+          {/* Menú de Usuarios */}
           <li className="nav-item mb-3">
-            <a
-              className="nav-link text-white"
-              onClick={() => handleClickAndExpand(null, "usuarios")}
-              style={{ cursor: "pointer" }}
-            >
-              <i className="bi bi-person"></i> {isOpen && "Registro de usuarios"}
-            </a>
-          </li>
-
-          {/* Cuadro de mando */}
-          <li className="nav-item mb-3">
-            <a
+            <div
               className="nav-link text-white d-flex justify-content-between align-items-center"
-              onClick={() => {
-                if (!isOpen) setIsOpen(true);
-                setSubmenuOpen((prev) => ({ ...prev, usuarios: !prev.usuarios }));
-              }}
-              style={{ cursor: "pointer" }}
+              style={navLinkStyle}
+              onClick={() => toggleSubmenu("user")}
             >
-              <div>
-                <i className="bi bi-bar-chart"></i> {isOpen && "Cuadro de mando"}
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <i style={iconStyle} className="bi bi-person"></i>
+                {isOpen && "Usuarios"}
               </div>
               {isOpen && (
-                <i
-                  className={`bi ${
-                    submenuOpen.usuarios ? "bi-chevron-up" : "bi-chevron-down"
-                  }`}
-                ></i>
+                <i style={iconStyle} className={`bi ${submenuOpen.user ? "bi-chevron-up" : "bi-chevron-down"}`}></i>
               )}
-            </a>
-            {isOpen && submenuOpen.usuarios && (
+            </div>
+            {submenuOpen.user && isOpen && (
               <ul className="nav flex-column ms-3 submenu">
                 <li className="nav-item">
-                  <Link href="#" className="nav-link text-white">
-                    Aprobación de usuarios
+                  <Link href="/user-management" className="nav-link text-white" style={navLinkStyle}>
+                    Listado De Usuarios
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link href="#" className="nav-link text-white">
-                    Configuración de parámetros
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link href="#" className="nav-link text-white">
-                    Emisión de reportes
+                  <Link href="/user-create" className="nav-link text-white" style={navLinkStyle}>
+                    Registro De Usuario
                   </Link>
                 </li>
               </ul>
             )}
           </li>
 
-          {/* Configuracion */}
+          {/* Menú de Parámetros */}
           <li className="nav-item mb-3">
-            <Link href="#" className="nav-link text-white">
-              <i className="bi bi-gear"></i> {isOpen && "Configuración"}
+            <div
+              className="nav-link text-white d-flex justify-content-between align-items-center"
+              style={navLinkStyle}
+              onClick={() => toggleSubmenu("parametros")}
+            >
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <i style={iconStyle} className="bi bi-sliders"></i>
+                {isOpen && "Parametros"}
+              </div>
+              {isOpen && (
+                <i style={iconStyle} className={`bi ${submenuOpen.parametros ? "bi-chevron-up" : "bi-chevron-down"}`}></i>
+              )}
+            </div>
+            {submenuOpen.parametros && isOpen && (
+              <ul className="nav flex-column ms-3 submenu">
+                <li className="nav-item">
+                  <Link href="/constants-management" className="nav-link text-white" style={navLinkStyle}>
+                    Listado De Materiales
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link href="/administration" className="nav-link text-white" style={navLinkStyle}>
+                    Administrador de Parametros
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </li>
+
+          {/* Elemento de Configuración */}
+          <li className="nav-item mb-3">
+            <Link href="/settings" className="nav-link text-white" style={navLinkStyle}>
+              <i style={iconStyle} className="bi bi-gear"></i>
+              {isOpen && "Configuración"}
             </Link>
+          </li>
+
+          {/* Elemento Salir */}
+          <li className="nav-item mb-3">
+            <div className="nav-link text-white" style={navLinkStyle} onClick={handleLogout}>
+              <i style={iconStyle} className="bi bi-box-arrow-right"></i>
+              {isOpen && "Salir"}
+            </div>
           </li>
         </ul>
       </div>
 
+      {/* Estilos adicionales locales */}
       <style jsx>{`
         .sidebar {
           overflow-x: hidden;
         }
-        .nav-link {
-          font-size: 16px;
-        }
         .submenu {
           margin-top: 0.5rem;
+          font-family: var(--font-family-base);
         }
         .menu-container {
           width: 100%;
           flex: 1;
-          background-color: #2c99a4;
-          padding: 0.0rem;
+          background-color: var(--primary-color);
+          padding: 0;
           border-radius: 0.5rem;
+          font-family: var(--font-family-base);
         }
       `}</style>
     </nav>

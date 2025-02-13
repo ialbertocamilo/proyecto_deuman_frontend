@@ -1,83 +1,202 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import React from "react";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  RadialLinearScale,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Line, Bar, Pie, Doughnut, Radar } from "react-chartjs-2";
 import Navbar from "../src/components/layout/Navbar";
 import TopBar from "../src/components/layout/TopBar";
-import ProjectList from "../src/components/forms/ProjectList";
-import ProjectWorkflow from "../src/components/forms/ProjectWorkflow";
+import "../public/assets/css/globals.css";
 
-const Dashboard = () => {
-  const [activeView, setActiveView] = useState<string>("projects");
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [sidebarWidth, setSidebarWidth] = useState("300px"); 
-  const router = useRouter();
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  RadialLinearScale,
+  Title,
+  Tooltip,
+  Legend
+);
 
-  useEffect(() => {
-    const checkAuth = () => {
-      const storedAuth =
-        localStorage.getItem("isAuthenticated") ||
-        sessionStorage.getItem("isAuthenticated");
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
+const DashboardPage: React.FC = () => {
+  const lineData = {
+    labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"],
+    datasets: [
+      {
+        label: "Proyectos Nuevos",
+        data: [12, 19, 3, 5, 2, 3],
+        borderColor: "#3ca7b7",
+        backgroundColor: "rgba(60, 167, 183, 0.2)",
+        tension: 0.4,
+        fill: true,
+      },
+    ],
+  };
 
-      console.log("🔍 isAuthenticated:", storedAuth);
-      console.log("🔍 Token:", token);
+  const barData = {
+    labels: ["Usuario A", "Usuario B", "Usuario C", "Usuario D", "Usuario E"],
+    datasets: [
+      {
+        label: "Reportes",
+        data: [5, 9, 3, 7, 4],
+        backgroundColor: "#3ca7b7",
+      },
+    ],
+  };
 
-      if (storedAuth === "true" && token) {
-        console.log("Usuario autenticado. Mostrando Dashboard.");
-        setIsAuthenticated(true);
-      } else {
-        console.log("No autenticado. Redirigiendo a /login...");
-        setIsAuthenticated(false);
-        router.replace("/login");
-      }
-    };
+  const pieData = {
+    labels: ["Proyecto 1", "Proyecto 2", "Proyecto 3"],
+    datasets: [
+      {
+        label: "Proyectos",
+        data: [10, 20, 30],
+        backgroundColor: ["#3ca7b7", "#74b9ff", "#dfe6e9"],
+      },
+    ],
+  };
 
-    setTimeout(checkAuth, 500);
-  }, [router]);
+  const doughnutData = {
+    labels: ["Completados", "En Progreso", "Pendientes"],
+    datasets: [
+      {
+        label: "Estado de Proyectos",
+        data: [50, 30, 20],
+        backgroundColor: ["#3ca7b7", "#74b9ff", "#dfe6e9"],
+      },
+    ],
+  };
 
-  if (isAuthenticated === null) {
-    return (
-      <div className="text-center mt-5">
-        <h2 className="fw-bold text-primary">Cargando...</h2>
-      </div>
-    );
-  }
+  const radarData = {
+    labels: ["Eficiencia", "Creatividad", "Colaboración", "Innovación", "Rentabilidad"],
+    datasets: [
+      {
+        label: "Evaluación de Usuario",
+        data: [65, 59, 90, 81, 56],
+        backgroundColor: "rgba(60, 167, 183, 0.2)",
+        borderColor: "#3ca7b7",
+        pointBackgroundColor: "#3ca7b7",
+      },
+    ],
+  };
 
-  const renderContent = () => {
-    switch (activeView) {
-      case "projectWorkflow":
-        return <ProjectWorkflow setActiveView={setActiveView} />;
-      case "projects":
-        return <ProjectList setActiveView={setActiveView} />;
-      default:
-        return (
-          <div className="text-center mt-5">
-            <h1 className="fw-bold text-primary">¡Bienvenido!</h1>
-            <p>Gestiona tus proyectos de manera eficiente.</p>
-            <i className="bi bi-bar-chart-fill text-primary" style={{ fontSize: "50px" }}></i>
-          </div>
-        );
-    }
+  const chartContainerStyle: React.CSSProperties = {
+    backgroundColor: "#fff",
+    padding: "10px",
+    borderRadius: "8px",
+    boxShadow: "0 0 5px rgba(0,0,0,0.1)",
+    boxSizing: "border-box",
+    height: "350px",
+    display: "flex",
+    flexDirection: "column",
+  };
+
+  const chartTitleStyle: React.CSSProperties = {
+    textAlign: "center",
+    color: "#3ca7b7",
+    margin: "0 0 10px 0",
+    fontWeight: "normal",
+    fontSize: "1.1rem",
+  };
+
+  const chartContentStyle: React.CSSProperties = {
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
   };
 
   return (
-    <div className="d-flex">
-      <Navbar setActiveView={setActiveView} setSidebarWidth={setSidebarWidth} />
+    <>
+      <Navbar setActiveView={() => {}} setSidebarWidth={() => {}} />
+      <TopBar sidebarWidth="300px" />
       <div
-        className="d-flex flex-column flex-grow-1"
         style={{
-          marginLeft: sidebarWidth,
-          width: "100%",
+          padding: "20px",
+          marginTop: "90px",
+          marginLeft: "320px",
+          marginRight: "50px",
+          fontFamily: "var(--font-family-base)",
         }}
       >
-        <TopBar sidebarWidth={sidebarWidth} />
-        <div className="content p-4" style={{ marginTop: "60px" }}>
-          {renderContent()}
+        <h1 style={{ color: "#3ca7b7", marginBottom: "20px" }}>Dashboard</h1>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "30px",
+          }}
+        >
+          <div style={chartContainerStyle}>
+            <h3 style={chartTitleStyle}>Proyectos Nuevos</h3>
+            <div style={chartContentStyle}>
+              <Line data={lineData} options={{ maintainAspectRatio: false }} />
+            </div>
+          </div>
+          <div style={chartContainerStyle}>
+            <h3 style={chartTitleStyle}>Reportes de Usuario</h3>
+            <div style={chartContentStyle}>
+              <Bar data={barData} options={{ maintainAspectRatio: false }} />
+            </div>
+          </div>
+          <div style={chartContainerStyle}>
+            <h3 style={chartTitleStyle}>Distribución de Proyectos</h3>
+            <div style={chartContentStyle}>
+              <Pie data={pieData} options={{ maintainAspectRatio: false }} />
+            </div>
+          </div>
+          <div style={chartContainerStyle}>
+            <h3 style={chartTitleStyle}>Estado de Proyectos</h3>
+            <div style={chartContentStyle}>
+              <Doughnut data={doughnutData} options={{ maintainAspectRatio: false }} />
+            </div>
+          </div>
+          <div style={chartContainerStyle}>
+            <h3 style={chartTitleStyle}>Evaluación de Usuario</h3>
+            <div style={chartContentStyle}>
+              <Radar data={radarData} options={{ maintainAspectRatio: false }} />
+            </div>
+          </div>
+          <div style={chartContainerStyle}>
+            <h3 style={chartTitleStyle}>Reporte Extra 1</h3>
+            <div style={chartContentStyle}>
+              <Bar data={barData} options={{ maintainAspectRatio: false }} />
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+      <style jsx>{`
+        /* Estilos para las tablas, en caso de usarse en otros componentes */
+        table {
+          width: 100%;
+          background-color: #fff;
+          border-collapse: separate;
+          border-spacing: 4px;
+        }
+        .table th,
+        .table td {
+          border: 2px solid #ccc;
+          border-radius: 4px;
+          padding: 6px;
+          text-align: center;
+          background-color: #fff;
+          font-weight: normal;
+        }
+      `}</style>
+    </>
   );
 };
 
-export default Dashboard;
+export default DashboardPage;
