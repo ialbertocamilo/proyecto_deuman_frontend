@@ -5,6 +5,7 @@ import { constantUrlApiEndpoint } from "../src/utils/constant-url-endpoint";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import CustomButton from "../src/components/common/CustomButton";
+import Link from "next/link";
 
 const TwoFactorAuth = () => {
   const [otp, setOtp] = useState<string>("");
@@ -70,6 +71,14 @@ const TwoFactorAuth = () => {
       if (data.user) {
         localStorage.setItem("userProfile", JSON.stringify(data.user));
         console.log("Perfil de usuario guardado correctamente:", data.user);
+
+        // Guardar role_id en local storage
+        if (data.user.role_id) {
+          localStorage.setItem("role_id", data.user.role_id.toString());
+          console.log("role_id almacenado correctamente:", data.user.role_id);
+        } else {
+          console.warn("No se encontró role_id en la respuesta del backend.");
+        }
       } else {
         console.warn("No se recibió información de perfil del usuario.");
       }
@@ -80,9 +89,10 @@ const TwoFactorAuth = () => {
       setTimeout(() => {
         router.push("/dashboard");
       }, 200);
-    } catch (err: any) {
-      console.error("Error en la verificación:", err.message);
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Error desconocido";
+      console.error("Error en la verificación:", message);
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -136,26 +146,30 @@ const TwoFactorAuth = () => {
           backgroundColor: "#fff",
         }}
       >
-        <h5 
-          className="fw-bold text-center" 
-          style={{ 
-            color: "var(--primary-color)", 
-            marginBottom: "0.5rem", 
-            fontFamily: "var(--font-family-base)" 
+        <h5
+          className="fw-bold text-center"
+          style={{
+            color: "var(--primary-color)",
+            marginBottom: "0.5rem",
+            fontFamily: "var(--font-family-base)",
           }}
         >
           Autenticación de Dos Pasos
         </h5>
-        <p 
-          className="text-muted text-center" 
-          style={{ 
-            marginBottom: "1rem", 
-            fontFamily: "var(--font-family-base)" 
+        <p
+          className="text-muted text-center"
+          style={{
+            marginBottom: "1rem",
+            fontFamily: "var(--font-family-base)",
           }}
         >
           Ingresa el código de 6 dígitos enviado a tu email.
         </p>
-        {error && <p className="text-danger text-center fw-bold" style={{ fontFamily: "var(--font-family-base)" }}>{error}</p>}
+        {error && (
+          <p className="text-danger text-center fw-bold" style={{ fontFamily: "var(--font-family-base)" }}>
+            {error}
+          </p>
+        )}
         <form onSubmit={handleSubmit} className="form-auth">
           <input
             type="text"
@@ -168,24 +182,14 @@ const TwoFactorAuth = () => {
             pattern="[0-9]{6}"
             inputMode="numeric"
           />
-          <CustomButton
-            type="submit"
-            variant="save"
-            disabled={loading}
-            style={submitButtonOverride}
-          >
+          <CustomButton type="submit" variant="save" disabled={loading} style={submitButtonOverride}>
             {loading ? "Verificando..." : "Confirmar Código"}
           </CustomButton>
         </form>
         <div style={{ textAlign: "center", marginTop: "1rem" }}>
-          <CustomButton
-            type="button"
-            variant="backIcon"
-            onClick={() => router.push("/login")}
-            style={regresarButtonStyle}
-          >
+          <Link href="/login" style={regresarButtonStyle}>
             Regresar
-          </CustomButton>
+          </Link>
         </div>
       </div>
       <style jsx>{`

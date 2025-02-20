@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -31,6 +31,9 @@ ChartJS.register(
 );
 
 const DashboardPage: React.FC = () => {
+  // Manejamos dinámicamente el ancho de la barra lateral
+  const [sidebarWidth, setSidebarWidth] = useState("300px");
+
   const lineData = {
     labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"],
     datasets: [
@@ -119,60 +122,69 @@ const DashboardPage: React.FC = () => {
   };
 
   return (
-    <>
-      <Navbar setActiveView={() => {}} setSidebarWidth={() => {}} />
-      <TopBar sidebarWidth="300px" />
+    <div className="d-flex" style={{ fontFamily: "var(--font-family-base)" }}>
+      {/* Se utiliza el componente Navbar y se le pasa el setSidebarWidth para gestionar el ancho dinámicamente */}
+      <Navbar setActiveView={() => {}} setSidebarWidth={setSidebarWidth} />
       <div
+        className="d-flex flex-column flex-grow-1"
         style={{
-          padding: "20px",
-          marginTop: "90px",
-          marginLeft: "320px",
-          marginRight: "50px",
-          fontFamily: "var(--font-family-base)",
+          marginLeft: sidebarWidth,
+          width: "100%",
         }}
       >
-        <h1 style={{ color: "#3ca7b7", marginBottom: "20px" }}>Dashboard</h1>
+        {/* TopBar recibe el ancho de la barra lateral */}
+        <TopBar sidebarWidth={sidebarWidth} />
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "30px",
+            padding: "20px",
+            marginTop: "90px",
+            marginRight: "50px",
+            fontFamily: "var(--font-family-base)",
           }}
         >
-          <div style={chartContainerStyle}>
-            <h3 style={chartTitleStyle}>Proyectos Nuevos</h3>
-            <div style={chartContentStyle}>
-              <Line data={lineData} options={{ maintainAspectRatio: false }} />
+          <h1 style={{ color: "#3ca7b7", marginBottom: "20px" }}>Dashboard</h1>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "30px",
+            }}
+          >
+            <div style={chartContainerStyle}>
+              <h3 style={chartTitleStyle}>Proyectos Nuevos</h3>
+              <div style={chartContentStyle}>
+                <Line data={lineData} options={{ maintainAspectRatio: false }} />
+              </div>
             </div>
-          </div>
-          <div style={chartContainerStyle}>
-            <h3 style={chartTitleStyle}>Reportes de Usuario</h3>
-            <div style={chartContentStyle}>
-              <Bar data={barData} options={{ maintainAspectRatio: false }} />
+            <div style={chartContainerStyle}>
+              <h3 style={chartTitleStyle}>Reportes de Usuario</h3>
+              <div style={chartContentStyle}>
+                <Bar data={barData} options={{ maintainAspectRatio: false }} />
+              </div>
             </div>
-          </div>
-          <div style={chartContainerStyle}>
-            <h3 style={chartTitleStyle}>Distribución de Proyectos</h3>
-            <div style={chartContentStyle}>
-              <Pie data={pieData} options={{ maintainAspectRatio: false }} />
+            <div style={chartContainerStyle}>
+              <h3 style={chartTitleStyle}>Distribución de Proyectos</h3>
+              <div style={chartContentStyle}>
+                <Pie data={pieData} options={{ maintainAspectRatio: false }} />
+              </div>
             </div>
-          </div>
-          <div style={chartContainerStyle}>
-            <h3 style={chartTitleStyle}>Estado de Proyectos</h3>
-            <div style={chartContentStyle}>
-              <Doughnut data={doughnutData} options={{ maintainAspectRatio: false }} />
+            <div style={chartContainerStyle}>
+              <h3 style={chartTitleStyle}>Estado de Proyectos</h3>
+              <div style={chartContentStyle}>
+                <Doughnut data={doughnutData} options={{ maintainAspectRatio: false }} />
+              </div>
             </div>
-          </div>
-          <div style={chartContainerStyle}>
-            <h3 style={chartTitleStyle}>Evaluación de Usuario</h3>
-            <div style={chartContentStyle}>
-              <Radar data={radarData} options={{ maintainAspectRatio: false }} />
+            <div style={chartContainerStyle}>
+              <h3 style={chartTitleStyle}>Evaluación de Usuario</h3>
+              <div style={chartContentStyle}>
+                <Radar data={radarData} options={{ maintainAspectRatio: false }} />
+              </div>
             </div>
-          </div>
-          <div style={chartContainerStyle}>
-            <h3 style={chartTitleStyle}>Reporte Extra 1</h3>
-            <div style={chartContentStyle}>
-              <Bar data={barData} options={{ maintainAspectRatio: false }} />
+            <div style={chartContainerStyle}>
+              <h3 style={chartTitleStyle}>Reporte Extra 1</h3>
+              <div style={chartContentStyle}>
+                <Bar data={barData} options={{ maintainAspectRatio: false }} />
+              </div>
             </div>
           </div>
         </div>
@@ -195,7 +207,7 @@ const DashboardPage: React.FC = () => {
           font-weight: normal;
         }
       `}</style>
-    </>
+    </div>
   );
 };
 

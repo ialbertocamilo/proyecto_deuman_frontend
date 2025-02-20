@@ -1,134 +1,219 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-import { useState } from "react";
-import { useRouter } from "next/router";
-import { constantUrlApiEndpoint } from "../src/utils/constant-url-endpoint";
 import "../public/assets/css/globals.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import { constantUrlApiEndpoint } from "../src/utils/constant-url-endpoint";
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
 import CustomButton from "../src/components/common/CustomButton";
+import Link from "next/link";
 
-const ForgotPassword = () => {
-  const [email, setEmail] = useState<string>("");
+const TwoFactorAuth = () => {
+  const [otp, setOtp] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+  const [email, setEmail] = useState<string | null>(null);
+
+  // Verifica que si está logeado
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/dashboard");
+    }
+  }, [router]);  // Añadimos 'router' como dependencia
+
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("email");
+    if (!storedEmail) {
+      setError("No se encontró el email. Inicia sesión nuevamente.");
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    } else {
+      setEmail(storedEmail);
+    }
+  }, [router]);  // Añadimos 'router' como dependencia
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    if (!email) {
+      setError("El email no está definido. Vuelve a iniciar sesión.");
+      setLoading(false);
+      return;
+    }
+
+    const requestBody = { email, otp: otp.toString() };
+    console.log("Enviando código al backend:", JSON.stringify(requestBody, null, 2));
 
     try {
-      const response = await fetch(`${constantUrlApiEndpoint}/forgot-password`, {
+      const response = await fetch(`${constantUrlApiEndpoint}/2fa-verify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify(requestBody),
       });
 
-      const result = await response.json();
+      console.log("Respuesta completa del backend:", response);
+
+      const data = await response.json();
+      console.log("Respuesta del backend:", data);
 
       if (!response.ok) {
-        throw new Error(result.message || "Error en el proceso de recuperación de contraseña");
+        console.error("Error en la verificación:", data);
+        throw new Error(data.detail || "Código incorrecto.");
       }
 
-      localStorage.setItem("reset_email", email);
-      router.push("/resetpassword");
-      
-    } catch (error: any) {
-      setError(error.message);
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+        console.log("Token almacenado correctamente:", data.access_token);
+      } else {
+        console.error("No se recibió un token válido del backend.");
+        throw new Error("No se pudo autenticar el usuario.");
+      }
+
+      if (data.user) {
+        localStorage.setItem("userProfile", JSON.stringify(data.user));
+        console.log("Perfil de usuario guardado correctamente:", data.user);
+
+        // Guardar role_id en local storage
+        if (data.user.role_id) {
+          localStorage.setItem("role_id", data.user.role_id.toString());
+          console.log("role_id almacenado correctamente:", data.user.role_id);
+        } else {
+          console.warn("No se encontró role_id en la respuesta del backend.");
+        }
+      } else {
+        console.warn("No se recibió información de perfil del usuario.");
+      }
+
+      console.log("Autenticación completada. Redirigiendo...");
+      localStorage.setItem("isAuthenticated", "true");
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 200);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Error desconocido";
+      console.error("Error en la verificación:", message);
+      setError(message);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const otpInputStyle = {
+    textAlign: "center" as const,
+    fontSize: "2rem",
+    fontWeight: "bold" as const,
+    letterSpacing: "8px",
+    width: "100%",
+    padding: "15px",
+    border: "2px solid var(--muted-text)",
+    borderRadius: "10px",
+    marginBottom: "1rem",
+    fontFamily: "var(--font-family-base)",
+  };
+
+  const submitButtonOverride = {
+    width: "100%",
+  };
+
+  const regresarButtonStyle = {
+    border: "none",
+    backgroundColor: "transparent",
+    color: "var(--primary-color)",
+    fontSize: "1rem",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    cursor: "pointer",
+    textDecoration: "none" as const,
+    fontFamily: "var(--font-family-base)",
+  };
+
   return (
-    <div 
-      className="forgot-password-container d-flex justify-content-center align-items-center"
+    <div
+      className="twofactor-container d-flex justify-content-center align-items-center"
       style={{
         height: "100vh",
         background: "url('/assets/images/background.jpg') no-repeat center center/cover",
         fontFamily: "var(--font-family-base)",
       }}
     >
-      <div className="card p-5 shadow-lg forgot-password-card"
+      <div
+        className="card p-5 shadow-lg"
         style={{
           width: "100%",
           maxWidth: "420px",
           borderRadius: "15px",
-          backgroundColor: "rgba(255, 255, 255, 0.9)",
-          textAlign: "left",
+          backgroundColor: "#fff",
         }}
       >
-        <h4 
-          className="text-start fw-bold" 
-          style={{ color: "var(--primary-color)", fontFamily: "var(--font-family-base)" }}
+        <h5
+          className="fw-bold text-center"
+          style={{
+            color: "var(--primary-color)",
+            marginBottom: "0.5rem",
+            fontFamily: "var(--font-family-base)",
+          }}
         >
-          Recuperar contraseña
-        </h4>
-        <p 
-          className="text-start" 
-          style={{ color: "var(--muted-text)", marginBottom: "1.5rem", fontFamily: "var(--font-family-base)" }}
+          Autenticación de Dos Pasos
+        </h5>
+        <p
+          className="text-muted text-center"
+          style={{
+            marginBottom: "1rem",
+            fontFamily: "var(--font-family-base)",
+          }}
         >
-          Ingresa tu correo electrónico para recuperar tu contraseña
+          Ingresa el código de 6 dígitos enviado a tu email.
         </p>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label 
-              className="form-label fw-bold" 
-              style={{ textAlign: "left", display: "block", marginBottom: "0.5rem", color: "#000", fontFamily: "var(--font-family-base)" }}
-            >
-              Correo electrónico
-            </label>
-            <input
-              type="email"
-              className="form-control"
-              placeholder="Example@gmail.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{
-                border: "2px solid var(--muted-text)",
-                borderRadius: "0.5rem",
-                fontFamily: "var(--font-family-base)",
-                fontSize: "var(--font-size-base)",
-              }}
-            />
-          </div>
-          <CustomButton
-            type="submit"
-            variant="save"
-            style={{
-              borderRadius: "0.5rem",
-              marginBottom: "1.5rem",
-              fontFamily: "var(--font-family-base)",
-              fontSize: "var(--font-size-base)",
-              width: "100%",
-            }}
-          >
-            Enviar enlace de recuperación
+        {error && (
+          <p className="text-danger text-center fw-bold" style={{ fontFamily: "var(--font-family-base)" }}>
+            {error}
+          </p>
+        )}
+        <form onSubmit={handleSubmit} className="form-auth">
+          <input
+            type="text"
+            style={otpInputStyle}
+            placeholder="******"
+            maxLength={6}
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            required
+            pattern="[0-9]{6}"
+            inputMode="numeric"
+          />
+          <CustomButton type="submit" variant="save" disabled={loading} style={submitButtonOverride}>
+            {loading ? "Verificando..." : "Confirmar Código"}
           </CustomButton>
         </form>
-        {error && <p className="text-danger text-center mt-3" style={{ fontFamily: "var(--font-family-base)" }}>{error}</p>}
-        <div className="text-center mt-3">
-          <CustomButton
-            type="button"
-            variant="backIcon"
-            onClick={() => router.push("/login")}
-            style={{
-              borderRadius: "0.5rem",
-              fontFamily: "var(--font-family-base)",
-              fontSize: "var(--font-size-base)",
-            }}
-          >
+        <div style={{ textAlign: "center", marginTop: "1rem" }}>
+          <Link href="/login" style={regresarButtonStyle}>
             Regresar
-          </CustomButton>
+          </Link>
         </div>
       </div>
-
       <style jsx>{`
-        .forgot-password-container {
+        .twofactor-container {
           height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
           background: url('/assets/images/background.jpg') no-repeat center center/cover;
-          position: relative;
+        }
+        a:hover {
+          color: var(--secondary-color);
         }
       `}</style>
     </div>
   );
 };
 
-export default ForgotPassword;
+export default TwoFactorAuth;
